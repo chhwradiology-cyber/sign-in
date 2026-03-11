@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>彰化醫院放射科-會議簽到</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { color: #2c3e50; text-align: center; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    select, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; }
+    #sig-canvas { border: 2px dashed #95a5a6; border-radius: 4px; margin-top: 10px; background-color: #fff; touch-action: none; width: 100%; height: 200px; box-sizing: border-box; }
+    .btn-submit { background-color: #27ae60; color: white; border: none; margin-top: 20px; cursor: pointer; }
+    .btn-clear { background-color: #e74c3c; color: white; border: none; margin-top: 10px; cursor: pointer; }
+    #status { text-align: center; color: blue; font-weight: bold; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>會議簽到系統</h2>
+  
+  <label for="userName">請選擇人員</label>
+  <select id="userName">
+    <option value="">-- 請選擇您的姓名 --</option>
+    <optgroup label="主任/主管">
+      <option value="王憶芬">王憶芬 (主任)</option>
+    </optgroup>
+    <optgroup label="放射科成員">
+      <option value="吳建宏">吳建宏</option>
+      <option value="蕭恒隆">蕭恒隆</option>
+      <option value="陳英豪">陳英豪</option>
+      <option value="張慧蓮">張慧蓮</option>
+      <option value="陳志銘">陳志銘</option>
+      <option value="陳明潭">陳明潭</option>
+      <option value="劉冠育">劉冠育</option>
+      <option value="黃鈺評">黃鈺評</option>
+      <option value="張辰瑜">張辰瑜</option>
+      <option value="黃俊峰">黃俊峰</option>
+      <option value="梁郡顯">梁郡顯</option>
+      <option value="王裕文">王裕文</option>
+      <option value="巫佳樺">巫佳樺</option>
+      <option value="劉恬君">劉恬君</option>
+      <option value="陳靜琪">陳靜琪</option>
+      <option value="曾怡菁">曾怡菁</option>
+      <option value="林孟萱">林孟萱</option>
+      <option value="張羽婕">張羽婕</option>
+      <option value="林雨錞">林雨錞</option>
+      <option value="曾珮姍">曾珮姍</option>
+    </optgroup>
+  </select>
+
+  <label>手寫簽名區</label>
+  <canvas id="sig-canvas"></canvas>
+  
+  <button class="btn-clear" onclick="clearSig()">清除重簽</button>
+  <button class="btn-submit" id="submitBtn" onclick="submitSig()">確認簽到</button>
+  <p id="status"></p>
+</div>
+
+<script>
+  // 【請在此處填入你剛才複製的 GAS Web App URL】
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrfmVc56HD3n73Kg64V-fgrhKSL5zhZr3zy11dO8xjqCRuIFhgNZPuwgpUCmsM35uSGg/exec"; 
+
+  const canvas = document.getElementById('sig-canvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  // 初始化 Canvas 大小
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 200;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+  }
+  window.addEventListener('load', resizeCanvas);
+
+  // 繪圖邏輯
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+  function startDraw(e) { drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+  function doDraw(e) { if (!drawing) return; e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+  function stopDraw() { drawing = false; }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', doDraw);
+  window.addEventListener('mouseup', stopDraw);
+  canvas.addEventListener('touchstart', startDraw);
+  canvas.addEventListener('touchmove', doDraw);
+  canvas.addEventListener('touchend', stopDraw);
+
+  function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+  function submitSig() {
+    const name = document.getElementById('userName').value;
+    if (!name) return alert('請先選擇姓名！');
+    
+    document.getElementById('status').innerText = "上傳中，請稍候...";
+    document.getElementById('submitBtn').disabled = true;
+
+    const signature = canvas.toDataURL();
+    
+    // 請確認 fetch 的參數如下：
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors", // 必須有這一行
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "text/plain", // 注意：外部請求建議設為 text/plain 避免觸發預檢
+      },
+      body: JSON.stringify({ name: name, signature: signature })
+    })
+    .then(() => {
+      document.getElementById('status').innerText = "簽到成功！";
+      alert('謝謝 ' + name + '，簽到已完成。');
+      clearSig();
+      document.getElementById('status').innerText = "";
+      document.getElementById('submitBtn').disabled = false;
+    })
+    .catch(err => {
+      alert('發生錯誤，請檢查網路連線或 GAS 網址。');
+      document.getElementById('submitBtn').disabled = false;
+    });
+  }
+</script>
+
+</body>
+</html>
