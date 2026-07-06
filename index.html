@@ -45,30 +45,15 @@
     </a>
   </div>
   <button class="btn-submit" id="submitBtn" onclick="submitSig()">確認簽到</button>
-  <a id="surveyBtn"
-     href="https://docs.google.com/forms/d/1zttGvSl-Lss7MW137PDuVB14GmdM9cHkmHpdVjPNsFs/viewform?edit_requested=true"
-     target="_blank"
-     style="display:none; margin-top:10px; width:100%; padding:12px; background-color:#8e44ad; color:white; border-radius:4px; text-decoration:none; font-size:16px; text-align:center; box-sizing:border-box;">
-    填寫教師滿意度
-  </a>
   <p id="status"></p>
 </div>
 
 <script>
 // 頁面載入時，從試算表拉取人員名單
 window.addEventListener('load', function() {
-  resizeCanvas();
+  resizeCanvas();      // 同時修正 canvas 初始化問題
   loadMemberList();
-  checkSurveyDay();
 });
-
-function checkSurveyDay() {
-  const now = new Date();
-  // getDay() 回傳 0=日, 1=一, 2=二, 3=三, 4=四, 5=五, 6=六
-  const isTuesday = now.getDay() === 2;
-  const btn = document.getElementById('surveyBtn');
-  btn.style.display = isTuesday ? 'block' : 'none';
-}
 
 function loadMemberList() {
   const select = document.getElementById('userName');
