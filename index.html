@@ -43,14 +43,14 @@
        style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px; background-color:#2980b9; color:white; border-radius:4px; text-decoration:none; font-size:16px;">
       📋查看簽到單
     </a>
-    <a id="surveyBtn"
-       href="這裡填入問卷網址"
-       target="_blank"
-       style="display:none; flex:1; align-items:center; justify-content:center; padding:12px; background-color:#8e44ad; color:white; border-radius:4px; text-decoration:none; font-size:16px; text-align:center;">
-      📝填寫會議問卷
-    </a>
   </div>
   <button class="btn-submit" id="submitBtn" onclick="submitSig()">確認簽到</button>
+  <a id="surveyBtn"
+     href="https://docs.google.com/forms/d/1zttGvSl-Lss7MW137PDuVB14GmdM9cHkmHpdVjPNsFs/viewform?edit_requested=true"
+     target="_blank"
+     style="display:none; margin-top:10px; width:100%; padding:12px; background-color:#8e44ad; color:white; border-radius:4px; text-decoration:none; font-size:16px; text-align:center; box-sizing:border-box;">
+    📝 填寫教師滿意度
+  </a>
   <p id="status"></p>
 </div>
 
@@ -67,7 +67,7 @@ function checkSurveyDay() {
   // getDay() 回傳 0=日, 1=一, 2=二, 3=三, 4=四, 5=五, 6=六
   const isTuesday = now.getDay() === 2;
   const btn = document.getElementById('surveyBtn');
-  btn.style.display = isTuesday ? 'flex' : 'none';
+  btn.style.display = isTuesday ? 'block' : 'none';
 }
 
 function loadMemberList() {
